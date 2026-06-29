@@ -18,8 +18,8 @@ services:
     image: caddy:2-alpine
     container_name: feitosa-caddy-proxy
     restart: unless-stopped
-    network_mode: "host" # Caddy no host network para compartilhar com o AD e interceptar a 443/80 reais
-    command: caddy reverse-proxy --from localhost --to localhost:8000
+    network_mode: "host"
+    command: caddy reverse-proxy --from :80 --to localhost:8000
     # O Caddy ira automaticamente gerenciar um certificado local para 'localhost'
     volumes:
       - caddy_data:/data
