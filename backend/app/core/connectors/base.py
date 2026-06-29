@@ -1,0 +1,36 @@
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+
+class ADConnector(ABC):
+    
+    @abstractmethod
+    def connect(self):
+        """Estabelece conexao inicial se necessario"""
+        pass
+
+    # -- Usuarios --
+    @abstractmethod
+    def get_users(self) -> List[Dict[str, Any]]:
+        pass
+        
+    @abstractmethod
+    def create_user(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+        pass
+
+    # -- Grupos --
+    @abstractmethod
+    def get_groups(self) -> List[Dict[str, Any]]:
+        pass
+        
+    @abstractmethod
+    def create_group(self, group_data: Dict[str, Any]) -> Dict[str, Any]:
+        pass
+
+    # -- OUs --
+    @abstractmethod
+    def get_ous(self) -> List[Dict[str, Any]]:
+        pass
+        
+    @abstractmethod
+    def create_ou(self, ou_data: Dict[str, Any]) -> Dict[str, Any]:
+        pass

@@ -1,0 +1,151 @@
+from fastapi import APIRouter, Depends
+from typing import List, Dict, Any
+from app.core.ad_manager import ADManager
+from app.core.database import get_db
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+
+router = APIRouter()
+
+def get_connector(db: Session = Depends(get_db)):
+    manager = ADManager(db)
+    return manager.get_connector()
+
+# ========================================
+# Usuários
+# ========================================
+class UserCreate(BaseModel):
+    username: str
+    name: str
+    password: str
+    groups: list[str] = ["Domain Users"]
+
+@router.get("/users")
+def get_users(connector = Depends(get_connector)):
+    users = connector.get_users()
+    return {"users": users}
+
+@router.post("/users")
+def create_user(user: UserCreate, connector = Depends(get_connector)):
+    new_user = connector.create_user(user.model_dump())
+    return {"status": "success", "user": new_user}
+
+@router.put("/users/{id}")
+def update_user(id: int, user: dict, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+@router.delete("/users/{id}")
+def delete_user(id: int, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+@router.post("/users/{id}/reset-password")
+def reset_password(id: int, data: dict, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+# ========================================
+# Grupos
+# ========================================
+class GroupCreate(BaseModel):
+    name: str
+    description: str
+
+@router.get("/groups")
+def get_groups(connector = Depends(get_connector)):
+    groups = connector.get_groups()
+    return {"groups": groups}
+
+@router.post("/groups")
+def create_group(group: GroupCreate, connector = Depends(get_connector)):
+    new_group = connector.create_group(group.model_dump())
+    return {"status": "success", "group": new_group}
+
+@router.put("/groups/{id}")
+def update_group(id: int, group: dict, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+@router.delete("/groups/{id}")
+def delete_group(id: int, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+# ========================================
+# OUs (Unidades Organizacionais)
+# ========================================
+class OUCreate(BaseModel):
+    name: str
+    description: str
+
+@router.get("/ous")
+def get_ous(connector = Depends(get_connector)):
+    ous = connector.get_ous()
+    return {"ous": ous}
+
+@router.post("/ous")
+def create_ou(ou: OUCreate, connector = Depends(get_connector)):
+    new_ou = connector.create_ou(ou.model_dump())
+    return {"status": "success", "ou": new_ou}
+
+@router.delete("/ous/{id}")
+def delete_ou(id: int, connector = Depends(get_connector)):
+    return {"status": "success"}
+
+# ========================================
+# Módulos não migrados (Mocks mantidos)
+# ========================================
+computers = [
+    {"name": "DESKTOP-001", "os": "Windows 11 Pro", "ip": "192.168.1.50", "last_logon": "2026-06-26 08:30:00", "status": "active", "ou": "TI"},
+    {"name": "DESKTOP-002", "os": "Windows 10 Pro", "ip": "192.168.1.51", "last_logon": "2026-06-25 14:15:00", "status": "offline", "ou": "Cartorios"},
+]
+
+@router.get("/computers")
+def get_computers():
+    return {"computers": computers}
+
+dns_zones = [{"name": "feitosa.local", "status": "running"}]
+dns_records = [{"id": 1, "zone": "feitosa.local", "name": "server", "type": "A", "data": "192.168.1.10"}]
+
+@router.get("/dns/zones")
+def get_dns_zones(): return {"zones": dns_zones}
+@router.get("/dns/records")
+def get_dns_records(zone: str = None): return {"records": dns_records}
+@router.post("/dns/records")
+def create_dns_record(record: dict): return {"status": "success"}
+@router.delete("/dns/records/{record_id}")
+def delete_dns_record(record_id: int): return {"status": "success"}
+
+audit_logs = [{"id": 1, "timestamp": "2026-06-26 10:00:00", "user": "admin", "action": "CREATE_USER", "details": "Simulado", "ip": "127.0.0.1"}]
+@router.get("/audit/logs")
+def get_audit_logs(): return {"logs": audit_logs}
+
+backups = [{"id": 1, "filename": "samba_backup_20260625.tar.gz", "size": "45 MB", "date": "2026-06-25", "status": "success"}]
+@router.get("/backups")
+def get_backups(): return {"backups": backups}
+@router.post("/backups/run")
+def run_backup(): return {"status": "success", "backup": backups[0]}
+@router.post("/backups/restore/{backup_id}")
+def restore_backup(backup_id: int): return {"status": "success"}
+
+shares = [{"id": 1, "name": "Publico", "path": "/srv/samba/publico", "comment": "Geral", "status": "active"}]
+@router.get("/shares")
+def get_shares(): return {"shares": shares}
+@router.get("/shares/{share_id}/acl")
+def get_share_acl(share_id: int): return {"acl": []}
+@router.post("/shares")
+def create_share(share: dict): return {"status": "success"}
+
+settings_data = {"domain_name": "feitosa.local", "functional_level": "Windows Server 2008 R2", "password_complexity": True, "password_history": 24, "min_password_length": 7, "max_password_age": 42}
+@router.get("/settings")
+def get_settings(): return {"settings": settings_data}
+@router.post("/settings")
+def update_settings(new_settings: dict): return {"status": "success"}
+
+@router.get("/dashboard")
+def get_dashboard_stats(connector = Depends(get_connector)):
+    users = connector.get_users()
+    groups = connector.get_groups()
+    return {
+        "total_users": len(users),
+        "total_groups": len(groups),
+        "total_computers": len(computers),
+        "samba_status": "active",
+        "cpu_usage": 15,
+    }

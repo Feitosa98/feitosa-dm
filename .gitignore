@@ -1,0 +1,53 @@
+# Dependencias e Cache (Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.npm/
+
+# Dependencias e Cache (Python)
+backend/venv/
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Banco de dados e Dados locais
+backend/feitosa_ad.db
+backend/data/
+
+# IDE e Sistema Operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Variaveis de Ambiente e Seguranca
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.crt
+
+# Logs do Docker e aplicacao
+logs/
+*.log

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  feitosa-dm:
+    build: .
+    container_name: feitosa-directory-manager
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - samba_data:/var/lib/samba
+      - samba_etc:/etc/samba
+      - backend_db:/app/backend/data
+    environment:
+      - JWT_SECRET_KEY=feitosa_auto_generate_in_production
+      - JWT_EXPIRE_HOURS=2.0
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: feitosa-caddy-proxy
+    restart: unless-stopped
+    network_mode: "host" # Caddy no host network para compartilhar com o AD e interceptar a 443/80 reais
+    command: caddy reverse-proxy --from localhost --to localhost:8000
+    # O Caddy ira automaticamente gerenciar um certificado local para 'localhost'
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  samba_data:
+  samba_etc:
+  backend_db:
+  caddy_data:
+  caddy_config:
