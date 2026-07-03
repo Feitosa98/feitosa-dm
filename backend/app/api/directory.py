@@ -91,14 +91,10 @@ def delete_ou(id: int, connector = Depends(get_connector)):
 # ========================================
 # Módulos não migrados (Mocks mantidos)
 # ========================================
-computers = [
-    {"name": "DESKTOP-001", "os": "Windows 11 Pro", "ip": "192.168.1.50", "last_logon": "2026-06-26 08:30:00", "status": "active", "ou": "TI"},
-    {"name": "DESKTOP-002", "os": "Windows 10 Pro", "ip": "192.168.1.51", "last_logon": "2026-06-25 14:15:00", "status": "offline", "ou": "Cartorios"},
-]
-
 @router.get("/computers")
-def get_computers():
-    return {"computers": computers}
+def get_computers(connector = Depends(get_connector)):
+    comps = connector.get_computers()
+    return {"computers": comps}
 
 dns_zones = [{"name": "feitosa.local", "status": "running"}]
 dns_records = [{"id": 1, "zone": "feitosa.local", "name": "server", "type": "A", "data": "192.168.1.10"}]
@@ -162,10 +158,11 @@ def get_dashboard_stats(connector = Depends(get_connector)):
     try:
         users = connector.get_users()
         groups = connector.get_groups()
+        comps = connector.get_computers()
         return {
             "total_users": len(users),
             "total_groups": len(groups),
-            "total_computers": len(computers),
+            "total_computers": len(comps),
             "samba_status": "active",
             "cpu_usage": 15,
         }
@@ -174,7 +171,7 @@ def get_dashboard_stats(connector = Depends(get_connector)):
         return {
             "total_users": 0,
             "total_groups": 0,
-            "total_computers": len(computers),
+            "total_computers": 0,
             "samba_status": "offline",
             "cpu_usage": 0,
         }

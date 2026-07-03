@@ -31,8 +31,44 @@ def setup_provision(req: SetupProvisionRequest, db: Session = Depends(get_db)):
     if config.is_configured:
         raise HTTPException(status_code=400, detail="Sistema já está configurado.")
     
-    # Simula o tempo de provisionamento (samba-tool domain provision)
-    time.sleep(2)
+    import subprocess
+    import os
+    import shutil
+
+    try:
+        # O samba exige que os diretorios estejam limpos para criar do zero
+        if os.path.exists("/etc/samba/smb.conf"):
+            os.remove("/etc/samba/smb.conf")
+        
+        # Limpar banco de dados parcial se tiver falhado no meio do processo
+        if os.path.exists("/var/lib/samba/private"):
+            shutil.rmtree("/var/lib/samba/private", ignore_errors=True)
+        if os.path.exists("/var/lib/samba/sysvol"):
+            shutil.rmtree("/var/lib/samba/sysvol", ignore_errors=True)
+
+        realm = req.domain_name.upper()
+        domain = req.domain_name.split(".")[0].upper()
+
+        cmd = [
+            "samba-tool", "domain", "provision",
+            "--use-rfc2307",
+            f"--realm={realm}",
+            f"--domain={domain}",
+            "--server-role=dc",
+            "--dns-backend=SAMBA_INTERNAL",
+            f"--adminpass={req.admin_password}"
+        ]
+        
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print("Samba Provision Output:", result.stdout)
+        
+        # Iniciar os serviços do Samba em background
+        subprocess.run(["samba", "-D"], check=False)
+    except subprocess.CalledProcessError as e:
+        print("Samba Provision Error:", e.stderr)
+        raise HTTPException(status_code=500, detail=f"Falha ao provisionar Samba AD: {e.stderr}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro critico: {str(e)}")
     
     config.mode = "local_provision"
     config.domain_name = req.domain_name
@@ -40,7 +76,7 @@ def setup_provision(req: SetupProvisionRequest, db: Session = Depends(get_db)):
     config.admin_password = req.admin_password
     config.is_configured = True
     db.commit()
-    return {"status": "success", "message": "Domínio provisionado com sucesso."}
+    return {"status": "success", "message": "Domínio provisionado com sucesso no OS."}
 
 @router.post("/connect")
 def setup_connect(req: SetupConnectRequest, db: Session = Depends(get_db)):
