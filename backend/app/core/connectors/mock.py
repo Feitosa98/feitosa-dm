@@ -41,6 +41,13 @@ class MockConnector(ADConnector):
         self.users.append(new_user)
         return new_user
 
+    def delete_user(self, username: str) -> bool:
+        self.users = [u for u in self.users if u["username"] != username]
+        return True
+
+    def reset_password(self, username: str, new_password: str) -> bool:
+        return True
+
     # -- Grupos --
     def get_groups(self) -> List[Dict[str, Any]]:
         return self.groups
@@ -54,6 +61,10 @@ class MockConnector(ADConnector):
         }
         self.groups.append(new_group)
         return new_group
+
+    def delete_group(self, groupname: str) -> bool:
+        self.groups = [g for g in self.groups if g["name"] != groupname]
+        return True
 
     # -- Computers --
     def get_computers(self) -> List[Dict[str, Any]]:
@@ -72,3 +83,7 @@ class MockConnector(ADConnector):
         }
         self.ous.append(new_ou)
         return new_ou
+
+    def delete_ou(self, ou_name: str) -> bool:
+        self.ous = [o for o in self.ous if o["name"] != ou_name]
+        return True

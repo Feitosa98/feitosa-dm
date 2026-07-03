@@ -8,6 +8,7 @@ class ADConnector(ABC):
         """Estabelece conexao inicial se necessario"""
         pass
 
+
     # -- Usuarios --
     @abstractmethod
     def get_users(self) -> List[Dict[str, Any]]:
@@ -17,6 +18,14 @@ class ADConnector(ABC):
     def create_user(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
+    @abstractmethod
+    def delete_user(self, username: str) -> bool:
+        pass
+
+    @abstractmethod
+    def reset_password(self, username: str, new_password: str) -> bool:
+        pass
+
     # -- Grupos --
     @abstractmethod
     def get_groups(self) -> List[Dict[str, Any]]:
@@ -24,6 +33,10 @@ class ADConnector(ABC):
         
     @abstractmethod
     def create_group(self, group_data: Dict[str, Any]) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def delete_group(self, groupname: str) -> bool:
         pass
 
     # -- Computers --
@@ -38,4 +51,8 @@ class ADConnector(ABC):
         
     @abstractmethod
     def create_ou(self, ou_data: Dict[str, Any]) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def delete_ou(self, ou_name: str) -> bool:
         pass

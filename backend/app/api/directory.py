@@ -35,11 +35,24 @@ def update_user(id: int, user: dict, connector = Depends(get_connector)):
     return {"status": "success"}
 
 @router.delete("/users/{id}")
-def delete_user(id: int, connector = Depends(get_connector)):
+def delete_user(id: str, connector = Depends(get_connector)):
+    success = connector.delete_user(id)
+    if not success:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Erro ao deletar usuário.")
     return {"status": "success"}
 
 @router.post("/users/{id}/reset-password")
-def reset_password(id: int, data: dict, connector = Depends(get_connector)):
+def reset_password(id: str, data: dict, connector = Depends(get_connector)):
+    new_password = data.get("new_password")
+    if not new_password:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Nova senha não fornecida.")
+    
+    success = connector.reset_password(id, new_password)
+    if not success:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Erro ao redefinir a senha.")
     return {"status": "success"}
 
 # ========================================
@@ -64,7 +77,11 @@ def update_group(id: int, group: dict, connector = Depends(get_connector)):
     return {"status": "success"}
 
 @router.delete("/groups/{id}")
-def delete_group(id: int, connector = Depends(get_connector)):
+def delete_group(id: str, connector = Depends(get_connector)):
+    success = connector.delete_group(id)
+    if not success:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Erro ao deletar grupo.")
     return {"status": "success"}
 
 # ========================================
@@ -85,7 +102,11 @@ def create_ou(ou: OUCreate, connector = Depends(get_connector)):
     return {"status": "success", "ou": new_ou}
 
 @router.delete("/ous/{id}")
-def delete_ou(id: int, connector = Depends(get_connector)):
+def delete_ou(id: str, connector = Depends(get_connector)):
+    success = connector.delete_ou(id)
+    if not success:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Erro ao deletar OU.")
     return {"status": "success"}
 
 # ========================================

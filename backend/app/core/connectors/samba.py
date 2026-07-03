@@ -50,6 +50,24 @@ class SambaLocalConnector(ADConnector):
         self._run_cmd(cmd)
         return user_data
 
+    def delete_user(self, username: str) -> bool:
+        if not username:
+            return False
+        try:
+            self._run_cmd(["samba-tool", "user", "delete", username])
+            return True
+        except:
+            return False
+
+    def reset_password(self, username: str, new_password: str) -> bool:
+        if not username or not new_password:
+            return False
+        try:
+            self._run_cmd(["samba-tool", "user", "setpassword", username, f"--newpassword={new_password}"])
+            return True
+        except:
+            return False
+
     # -- Grupos --
     def get_groups(self) -> List[Dict[str, Any]]:
         try:
@@ -78,6 +96,15 @@ class SambaLocalConnector(ADConnector):
             
         self._run_cmd(cmd)
         return group_data
+
+    def delete_group(self, groupname: str) -> bool:
+        if not groupname:
+            return False
+        try:
+            self._run_cmd(["samba-tool", "group", "delete", groupname])
+            return True
+        except:
+            return False
 
     # -- Computadores --
     def get_computers(self) -> List[Dict[str, Any]]:
@@ -125,6 +152,15 @@ class SambaLocalConnector(ADConnector):
         # O comando real de add OU no samba-tool pode variar (ou add ou ldbadd).
         self._run_cmd(["samba-tool", "ou", "create", f"OU={name}"])
         return ou_data
+
+    def delete_ou(self, ou_name: str) -> bool:
+        if not ou_name:
+            return False
+        try:
+            self._run_cmd(["samba-tool", "ou", "delete", f"OU={ou_name}"])
+            return True
+        except:
+            return False
 
     # -- Configuracoes e Status --
     def get_settings(self) -> Dict[str, Any]:

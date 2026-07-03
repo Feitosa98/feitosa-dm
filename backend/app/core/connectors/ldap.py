@@ -52,6 +52,12 @@ class LDAPConnector(ADConnector):
     def create_user(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError("Criação de usuário via LDAP requer TLS e payload complexo de atributos. Ficará para próxima etapa.")
 
+    def delete_user(self, username: str) -> bool:
+        raise NotImplementedError("Exclusão de usuário via LDAP remota não suportada nesta versão.")
+
+    def reset_password(self, username: str, new_password: str) -> bool:
+        raise NotImplementedError("Reset de senha via LDAP requer TLS/SSL ativo.")
+
     # -- Grupos --
     def get_groups(self) -> List[Dict[str, Any]]:
         if not self.conn:
@@ -75,6 +81,9 @@ class LDAPConnector(ADConnector):
 
     def create_group(self, group_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError("Criação de grupo via LDAP pendente.")
+
+    def delete_group(self, groupname: str) -> bool:
+        raise NotImplementedError("Exclusão de grupo via LDAP pendente.")
 
     # -- Computadores --
     def get_computers(self) -> List[Dict[str, Any]]:
@@ -121,3 +130,6 @@ class LDAPConnector(ADConnector):
 
     def create_ou(self, ou_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError("Criação de OU via LDAP pendente.")
+
+    def delete_ou(self, ou_name: str) -> bool:
+        raise NotImplementedError("Exclusão de OU via LDAP pendente.")
