@@ -64,6 +64,7 @@ export function Login() {
                 className="pl-10"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
                 required
               />
             </div>
@@ -78,6 +79,7 @@ export function Login() {
                 className="pl-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
             </div>

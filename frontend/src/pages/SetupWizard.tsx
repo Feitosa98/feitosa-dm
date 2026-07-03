@@ -112,7 +112,7 @@ export function SetupWizard() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Senha do Administrador do Domínio</label>
-                  <Input required type="password" placeholder="********" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} />
+                  <Input required type="password" placeholder="********" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} autoComplete="new-password" />
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -149,12 +149,12 @@ export function SetupWizard() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Usuário (Administrator)</label>
-                  <Input required placeholder="Administrator" value={adminUser} onChange={e => setAdminUser(e.target.value)} />
+                  <Input required placeholder="Administrator" value={adminUser} onChange={e => setAdminUser(e.target.value)} autoComplete="username" />
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Senha</label>
-                  <Input required type="password" placeholder="********" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} />
+                  <Input required type="password" placeholder="********" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} autoComplete="current-password" />
                 </div>
                 
                 <Button type="submit" className="w-full mt-4" disabled={loading}>
