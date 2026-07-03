@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
 export const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,14 +17,14 @@ api.interceptors.request.use((config) => {
 });
 
 export const login = async (credentials: any) => {
-  const response = await axios.post("http://127.0.0.1:8000/api/auth/login", credentials, {
+  const response = await axios.post("/api/auth/login", credentials, {
     headers: { "Content-Type": "application/x-www-form-urlencoded" }
   });
   return response.data;
 };
 
 export const getMe = async (token: string) => {
-  const response = await axios.get("http://127.0.0.1:8000/api/auth/me", {
+  const response = await axios.get("/api/auth/me", {
     headers: { Authorization: `Bearer ${token}` }
   });
   return response.data;
