@@ -18,13 +18,22 @@ class LDAPConnector(ADConnector):
             self.search_base = ""
 
     def connect(self):
-        server = Server(self.server_ip, get_info=ALL)
-        self.conn = Connection(server, user=self.admin_user, password=self.admin_password, auto_bind=True)
+        try:
+            server = Server(self.server_ip, get_info=ALL)
+            self.conn = Connection(server, user=self.admin_user, password=self.admin_password, auto_bind=True)
+            return True
+        except Exception as e:
+            print(f"Erro ao conectar no LDAP: {e}")
+            self.conn = None
+            return False
 
     # -- Usuarios --
     def get_users(self) -> List[Dict[str, Any]]:
         if not self.conn:
             self.connect()
+            
+        if not self.conn:
+            return []
             
         self.conn.search(self.search_base, '(objectclass=user)', attributes=['sAMAccountName', 'cn', 'mail'])
         
@@ -48,6 +57,9 @@ class LDAPConnector(ADConnector):
         if not self.conn:
             self.connect()
             
+        if not self.conn:
+            return []
+            
         self.conn.search(self.search_base, '(objectclass=group)', attributes=['sAMAccountName', 'description', 'member'])
         
         groups = []
@@ -68,6 +80,9 @@ class LDAPConnector(ADConnector):
     def get_ous(self) -> List[Dict[str, Any]]:
         if not self.conn:
             self.connect()
+            
+        if not self.conn:
+            return []
             
         self.conn.search(self.search_base, '(objectclass=organizationalUnit)', attributes=['ou', 'description'])
         

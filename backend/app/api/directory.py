@@ -132,20 +132,49 @@ def get_share_acl(share_id: int): return {"acl": []}
 @router.post("/shares")
 def create_share(share: dict): return {"status": "success"}
 
-settings_data = {"domain_name": "feitosa.local", "functional_level": "Windows Server 2008 R2", "password_complexity": True, "password_history": 24, "min_password_length": 7, "max_password_age": 42}
+from app.models.system import SystemConfig
+
 @router.get("/settings")
-def get_settings(): return {"settings": settings_data}
+def get_settings(db: Session = Depends(get_db), connector = Depends(get_connector)): 
+    config = db.query(SystemConfig).first()
+    
+    # Tenta buscar configs reais do Samba (se houver erro ou for mock, devolve vazias)
+    samba_settings = {}
+    if hasattr(connector, 'get_settings'):
+        samba_settings = connector.get_settings()
+        
+    return {
+        "settings": {
+            "domain_name": config.domain_name if config else "Não configurado",
+            "functional_level": samba_settings.get("functional_level", "Desconhecido"),
+            "password_complexity": samba_settings.get("password_complexity", False),
+            "password_history": samba_settings.get("password_history", 0),
+            "min_password_length": samba_settings.get("min_password_length", 0),
+            "max_password_age": samba_settings.get("max_password_age", 0)
+        }
+    }
+
 @router.post("/settings")
 def update_settings(new_settings: dict): return {"status": "success"}
 
 @router.get("/dashboard")
 def get_dashboard_stats(connector = Depends(get_connector)):
-    users = connector.get_users()
-    groups = connector.get_groups()
-    return {
-        "total_users": len(users),
-        "total_groups": len(groups),
-        "total_computers": len(computers),
-        "samba_status": "active",
-        "cpu_usage": 15,
-    }
+    try:
+        users = connector.get_users()
+        groups = connector.get_groups()
+        return {
+            "total_users": len(users),
+            "total_groups": len(groups),
+            "total_computers": len(computers),
+            "samba_status": "active",
+            "cpu_usage": 15,
+        }
+    except Exception as e:
+        print(f"Erro no dashboard: {e}")
+        return {
+            "total_users": 0,
+            "total_groups": 0,
+            "total_computers": len(computers),
+            "samba_status": "offline",
+            "cpu_usage": 0,
+        }
