@@ -5,22 +5,8 @@ services:
     build: .
     container_name: feitosa-directory-manager
     restart: unless-stopped
-    ports:
-      - "8000:8000"
-      - "53:53"
-      - "53:53/udp"
-      - "88:88"
-      - "88:88/udp"
-      - "135:135"
-      - "137:137/udp"
-      - "138:138/udp"
-      - "139:139"
-      - "389:389"
-      - "389:389/udp"
-      - "445:445"
-      - "464:464"
-      - "464:464/udp"
-      - "636:636"
+    privileged: true
+    network_mode: "host"
     volumes:
       - samba_data:/var/lib/samba
       - samba_etc:/etc/samba
@@ -33,9 +19,8 @@ services:
     image: caddy:2-alpine
     container_name: feitosa-caddy-proxy
     restart: unless-stopped
-    ports:
-      - "80:80"
-    command: caddy reverse-proxy --from :80 --to feitosa-dm:8000
+    network_mode: "host"
+    command: caddy reverse-proxy --from :80 --to 127.0.0.1:8000
     # O Caddy ira automaticamente gerenciar um certificado local
     volumes:
       - caddy_data:/data
