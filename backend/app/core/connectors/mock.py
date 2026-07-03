@@ -17,6 +17,10 @@ class MockConnector(ADConnector):
             {"id": 2, "name": "Finance Department", "description": "Finance Users and Computers", "users_count": 15},
             {"id": 3, "name": "IT Operations", "description": "IT Staff", "users_count": 8},
         ]
+        self.computers = [
+            {"name": "DESKTOP-001", "os": "Windows 11 Pro", "ip": "192.168.1.50", "last_logon": "2026-06-26 08:30:00", "status": "active", "ou": "TI"},
+            {"name": "DESKTOP-002", "os": "Windows 10 Pro", "ip": "192.168.1.51", "last_logon": "2026-06-25 14:15:00", "status": "offline", "ou": "Cartorios"},
+        ]
 
     def connect(self):
         pass
@@ -50,6 +54,10 @@ class MockConnector(ADConnector):
         }
         self.groups.append(new_group)
         return new_group
+
+    # -- Computers --
+    def get_computers(self) -> List[Dict[str, Any]]:
+        return self.computers
 
     # -- OUs --
     def get_ous(self) -> List[Dict[str, Any]]:

@@ -26,6 +26,11 @@ class ADConnector(ABC):
     def create_group(self, group_data: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
+    # -- Computers --
+    @abstractmethod
+    def get_computers(self) -> List[Dict[str, Any]]:
+        pass
+
     # -- OUs --
     @abstractmethod
     def get_ous(self) -> List[Dict[str, Any]]:

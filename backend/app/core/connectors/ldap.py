@@ -76,6 +76,29 @@ class LDAPConnector(ADConnector):
     def create_group(self, group_data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError("Criação de grupo via LDAP pendente.")
 
+    # -- Computadores --
+    def get_computers(self) -> List[Dict[str, Any]]:
+        if not self.conn:
+            self.connect()
+            
+        if not self.conn:
+            return []
+            
+        self.conn.search(self.search_base, '(objectclass=computer)', attributes=['sAMAccountName', 'operatingSystem', 'dNSHostName'])
+        
+        computers = []
+        for entry in self.conn.entries:
+            if 'sAMAccountName' in entry:
+                computers.append({
+                    "name": str(entry.sAMAccountName).rstrip('$'),
+                    "os": str(entry.operatingSystem) if 'operatingSystem' in entry else "Desconhecido",
+                    "ip": str(entry.dNSHostName) if 'dNSHostName' in entry else "Desconhecido",
+                    "last_logon": "Desconhecido",
+                    "status": "active",
+                    "ou": "Computers"
+                })
+        return computers
+
     # -- OUs --
     def get_ous(self) -> List[Dict[str, Any]]:
         if not self.conn:
